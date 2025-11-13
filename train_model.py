@@ -26,10 +26,8 @@ y_pred = RD.predict(x_test)
 # print("MSE: ",mean_squared_error(y_test,y_pred))
 # print("R2: ",r2_score(y_test,y_pred))
 
-# with open("RD.pkl", 'wb') as f:
-#     pickle.dump(RD,f)
+with open("RD.pkl", 'wb') as f:
+    pickle.dump(RD,f)
 
-# with open("LE.pkl", 'wb') as f:
-#     pickle.dump(le,f)
-
-print(x)
+with open("LE.pkl", 'wb') as f:
+    pickle.dump(le,f)

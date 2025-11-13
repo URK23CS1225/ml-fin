@@ -1,0 +1,57 @@
+name: CI/CD Pipeline
+
+on: [push]
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Train model
+        run: python train_model.py
+
+      - name: Upload trained model as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: model-artifact
+          path: |
+              RD.pkl
+              LE.pkl
+
+  deploy:
+    needs: train
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download trained model artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: model-artifact
+          path: .
+
+      - name: Build Docker image
+        run: docker build -t ml-flask-app .
+
+      - name: Verify image build
+        run: docker images
+
+      - name: Run Docker container
+        run: |
+          docker run -d -p 8080:8080 --name ml-container ml-flask-app
+          echo "✅ Flask app container is running inside GitHub Actions (port 5000)"
